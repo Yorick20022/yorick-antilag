@@ -47,9 +47,9 @@ AddEventHandler("client_flames", function(c_veh)
         local boneIndex = GetEntityBoneIndexByName(NetToVeh(c_veh), bones)
         if boneIndex ~= -1 then
             UseParticleFxAssetNextCall(fxGroup)
-            local createdPart = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(c_veh), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(c_veh), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 GetEntityBoneIndexByName(NetToVeh(c_veh), bones), Config.flameSize, 0.0, 0.0, 0.0)
-            StopParticleFxLooped(createdPart, true)
+            StopParticleFxLooped(startParticle, true)
         end
     end
 end)
