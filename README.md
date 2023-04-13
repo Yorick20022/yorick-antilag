@@ -18,4 +18,4 @@ In addition to enabling antilag, you can also configure the following options:
 
 # Usage
 
-To use antilag in your FiveM server, simply start the yorick-antilag resource, `ensure yorick-antilag`. By default, the antilag effect is triggered when the vehicle reaches a specific amount of RPM.
+To use antilag in your FiveM server, simply start the yorick-antilag resource, `ensure yorick-antilag`. By default, the antilag effect is triggered when the driver of the vehicle releases the W key when the car reaches a specific amount of RPM.
