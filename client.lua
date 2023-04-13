@@ -9,13 +9,14 @@ end, false)
 RegisterNetEvent("client_flames")
 
 CreateThread(function()
-    while isAntiLagEnabled do
-        Wait(0)
+    while true do
+        local sleep = 1000
         local player = PlayerPedId()
         local veh = GetVehiclePedIsIn(player, false)
         local vehiclePos = GetEntityCoords(veh)
         local delay = (math.random(25, Config.explosionSpeed))
-        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player then
+        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player and isAntiLagEnabled then
+            sleep = 0
             local RPM = GetVehicleCurrentRpm(veh, player)
             local gear = GetVehicleCurrentGear(veh)
             local reverse = 0
@@ -35,6 +36,7 @@ CreateThread(function()
                 end
             end
         end
+        Wait(sleep)
     end
 end)
 
@@ -59,4 +61,3 @@ function message(text)
     AddTextComponentString(text)
     DrawNotification(false, false)
 end
-
