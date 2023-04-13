@@ -6,8 +6,6 @@ RegisterCommand("antilag", function()
     message("~" .. (isAntiLagEnabled and "g" or "r") .. "~Antilag is now " .. (isAntiLagEnabled and "enabled" or "disabled") .. " for you~")
 end, false)
 
-RegisterNetEvent("client_flames")
-
 CreateThread(function()
     while true do
         local sleep = 1000
@@ -44,6 +42,7 @@ local exhausts = { "exhaust", "exhaust_2", "exhaust_3", "exhaust_4" }
 local fxName = "veh_backfire"
 local fxGroup = "core"
 
+RegisterNetEvent("client_flames")
 AddEventHandler("client_flames", function(c_veh)
     for _, bones in pairs(exhausts) do
         local boneIndex = GetEntityBoneIndexByName(NetToVeh(c_veh), bones)
