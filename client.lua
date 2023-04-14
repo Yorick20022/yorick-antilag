@@ -3,22 +3,24 @@ local isAntiLagEnabled = true
 RegisterCommand("antilag", function()
     isAntiLagEnabled = not isAntiLagEnabled
     PlaySoundFrontend(-1, 'CONFIRM_BEEP', 'HUD_MINI_GAME_SOUNDSET', true)
-    message("~" .. (isAntiLagEnabled and "g" or "r") .. "~Antilag is now " .. (isAntiLagEnabled and "enabled" or "disabled") .. " for you~")
+    message("~" ..
+        (isAntiLagEnabled and "g" or "r") ..
+        "~Antilag is now " .. (isAntiLagEnabled and "enabled" or "disabled") .. " for you~")
 end, false)
 
-RegisterNetEvent("client_flames")
+local reverse = 0
 
 CreateThread(function()
-    while isAntiLagEnabled do
-        Wait(0)
+    while true do
+        local sleep = 1000
         local player = PlayerPedId()
         local veh = GetVehiclePedIsIn(player, false)
         local vehiclePos = GetEntityCoords(veh)
-        local delay = (math.random(25, Config.explosionSpeed))
-        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player then
+        local delay = math.random(25, Config.explosionSpeed)
+        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player and isAntiLagEnabled then
+            sleep = 0
             local RPM = GetVehicleCurrentRpm(veh, player)
             local gear = GetVehicleCurrentGear(veh)
-            local reverse = 0
 
             for _, cars in pairs(Config.Cars) do
                 local vehicleModel = GetEntityModel(veh, player)
@@ -35,6 +37,7 @@ CreateThread(function()
                 end
             end
         end
+        Wait(sleep)
     end
 end)
 
@@ -42,14 +45,18 @@ local exhausts = { "exhaust", "exhaust_2", "exhaust_3", "exhaust_4" }
 local fxName = "veh_backfire"
 local fxGroup = "core"
 
-AddEventHandler("client_flames", function(c_veh)
-    for _, bones in pairs(exhausts) do
-        local boneIndex = GetEntityBoneIndexByName(NetToVeh(c_veh), bones)
-        if boneIndex ~= -1 then
-            UseParticleFxAssetNextCall(fxGroup)
-            local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(c_veh), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                GetEntityBoneIndexByName(NetToVeh(c_veh), bones), Config.flameSize, 0.0, 0.0, 0.0)
-            StopParticleFxLooped(startParticle, true)
+RegisterNetEvent("client_flames")
+AddEventHandler("client_flames", function(vehicle)
+    if NetworkDoesEntityExistWithNetworkId(vehicle) then
+        for _, bones in pairs(exhausts) do
+            local boneIndex = GetEntityBoneIndexByName(NetToVeh(vehicle), bones)
+            if boneIndex ~= -1 then
+                UseParticleFxAssetNextCall(fxGroup)
+                local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(vehicle), 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0,
+                    GetEntityBoneIndexByName(NetToVeh(vehicle), bones), Config.flameSize, 0.0, 0.0, 0.0)
+                StopParticleFxLooped(startParticle, true)
+            end
         end
     end
 end)
@@ -59,4 +66,3 @@ function message(text)
     AddTextComponentString(text)
     DrawNotification(false, false)
 end
-

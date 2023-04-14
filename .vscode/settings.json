@@ -1,0 +1,19 @@
+{
+    "Lua.diagnostics.globals": [
+        "Wait",
+        "GetVehicleCurrentGear",
+        "GetEntityModel",
+        "GetPedInVehicleSeat",
+        "UseParticleFxAssetNextCall",
+        "global",
+        "message",
+        "SetNotificationTextEntry",
+        "AddTextComponentString",
+        "DrawNotification"
+    ],
+    "Lua.diagnostics.disable": [
+        "missing-parameter",
+        "redundant-parameter",
+        "param-type-mismatch"
+    ]
+}
