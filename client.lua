@@ -8,7 +8,7 @@ RegisterCommand("antilag", function()
         "~Antilag is now " .. (isAntiLagEnabled and "enabled" or "disabled") .. " for you~")
 end, false)
 
-local reverse = 0
+RegisterNetEvent("client_flames")
 
 CreateThread(function()
     while true do
@@ -16,9 +16,8 @@ CreateThread(function()
         local player = PlayerPedId()
         local veh = GetVehiclePedIsIn(player, false)
         local vehiclePos = GetEntityCoords(veh)
-        local delay = math.random(25, Config.explosionSpeed)
-        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player and isAntiLagEnabled then
-            sleep = 0
+        local delay = (math.random(25, Config.explosionSpeed))
+        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player then
             local RPM = GetVehicleCurrentRpm(veh, player)
             local gear = GetVehicleCurrentGear(veh)
 
@@ -45,18 +44,14 @@ local exhausts = { "exhaust", "exhaust_2", "exhaust_3", "exhaust_4" }
 local fxName = "veh_backfire"
 local fxGroup = "core"
 
-RegisterNetEvent("client_flames")
-AddEventHandler("client_flames", function(vehicle)
-    if NetworkDoesEntityExistWithNetworkId(vehicle) then
-        for _, bones in pairs(exhausts) do
-            local boneIndex = GetEntityBoneIndexByName(NetToVeh(vehicle), bones)
-            if boneIndex ~= -1 then
-                UseParticleFxAssetNextCall(fxGroup)
-                local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(vehicle), 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0,
-                    GetEntityBoneIndexByName(NetToVeh(vehicle), bones), Config.flameSize, 0.0, 0.0, 0.0)
-                StopParticleFxLooped(startParticle, true)
-            end
+AddEventHandler("client_flames", function(c_veh)
+    for _, bones in pairs(exhausts) do
+        local boneIndex = GetEntityBoneIndexByName(NetToVeh(c_veh), bones)
+        if boneIndex ~= -1 then
+            UseParticleFxAssetNextCall(fxGroup)
+            local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(c_veh), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                GetEntityBoneIndexByName(NetToVeh(c_veh), bones), Config.flameSize, 0.0, 0.0, 0.0)
+            StopParticleFxLooped(startParticle, true)
         end
     end
 end)
@@ -66,3 +61,4 @@ function message(text)
     AddTextComponentString(text)
     DrawNotification(false, false)
 end
+
