@@ -15,7 +15,6 @@ CreateThread(function()
         local sleep = 1000
         local player = PlayerPedId()
         local veh = GetVehiclePedIsIn(player, false)
-        local vehiclePos = GetEntityCoords(veh)
         local delay = math.random(25, Config.explosionSpeed)
         if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId()), -1) == player and isAntiLagEnabled then
             sleep = 0
@@ -26,11 +25,16 @@ CreateThread(function()
                 local vehicleModel = GetEntityModel(veh, player)
                 if GetHashKey(cars) == vehicleModel then
                     if gear ~= reverse then
-                        if not IsControlPressed(1, 71) and not IsControlPressed(1, 72) then
-                            if RPM > Config.RPM then
-                                TriggerServerEvent("flames", VehToNet(veh))
-                                AddExplosion(vehiclePos, 61, 0.0, true, true, 0.0, true)
-                                Wait(delay)
+                        if not IsEntityInAir(veh) then
+                            if not IsControlPressed(1, 71) and not IsControlPressed(1, 72) then
+                                if RPM > Config.RPM then
+                                    TriggerServerEvent("flames", VehToNet(veh))
+                                    TriggerServerEvent("sound_server:PlayWithinDistance", 25.0,
+                                        tostring(math.random(1, 6)),
+                                        0.9)
+                                    SetVehicleTurboPressure(veh, 25)
+                                    Wait(delay)
+                                end
                             end
                         end
                     end
@@ -45,6 +49,22 @@ local exhausts = { "exhaust", "exhaust_2", "exhaust_3", "exhaust_4" }
 local fxName = "veh_backfire"
 local fxGroup = "core"
 
+RegisterNetEvent('sound_client:PlayWithinDistance')
+AddEventHandler('sound_client:PlayWithinDistance', function(coords, disMax, audoFile, audioVol)
+    local entityCoords   = GetEntityCoords(PlayerPedId())
+    local distance       = #(entityCoords - coords)
+    local distanceRatio  = distance / disMax        -- calculate the distance ratio
+    local adjustedVolume = audioVol / distanceRatio -- adjust volume based on distance ratio
+
+    if (distance <= disMax) then
+        SendNUIMessage({
+            transactionType   = 'playSound',
+            transactionFile   = audoFile,
+            transactionVolume = adjustedVolume -- use the adjusted volume
+        })
+    end
+end)
+
 RegisterNetEvent("client_flames")
 AddEventHandler("client_flames", function(vehicle)
     if NetworkDoesEntityExistWithNetworkId(vehicle) then
@@ -52,7 +72,8 @@ AddEventHandler("client_flames", function(vehicle)
             local boneIndex = GetEntityBoneIndexByName(NetToVeh(vehicle), bones)
             if boneIndex ~= -1 then
                 UseParticleFxAssetNextCall(fxGroup)
-                local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(vehicle), 0.0, 0.0, 0.0, 0.0, 0.0,
+                local startParticle = StartParticleFxLoopedOnEntityBone(fxName, NetToVeh(vehicle), 0.0, 0.0, 0.0, 0.0,
+                    0.0,
                     0.0,
                     GetEntityBoneIndexByName(NetToVeh(vehicle), bones), Config.flameSize, 0.0, 0.0, 0.0)
                 StopParticleFxLooped(startParticle, true)
