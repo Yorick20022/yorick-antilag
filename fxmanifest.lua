@@ -9,7 +9,7 @@ version '1.0.0'
 ui_page('html/index.html')
 
 client_scripts {
-    'config.lua',
+    'config/config.lua',
     'client.lua'
 }
 
@@ -17,10 +17,5 @@ server_script 'server.lua'
 
 files {
     'html/index.html',
-    'html/sounds/1.ogg',
-    'html/sounds/2.ogg',
-    'html/sounds/3.ogg',
-    'html/sounds/4.ogg',
-    'html/sounds/5.ogg',
-    'html/sounds/6.ogg',
+    'html/sounds/**'
 }
